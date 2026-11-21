@@ -30,6 +30,12 @@ export function initFx() {
       spot.style.setProperty('--mx', `${e.clientX - r.left}px`)
       spot.style.setProperty('--my', `${e.clientY - r.top}px`)
     }
+    const hero = target?.closest<HTMLElement>('[data-hero]')
+    if (hero) {
+      const r = hero.getBoundingClientRect()
+      hero.style.setProperty('--hx', ((e.clientX - r.left) / r.width - 0.5).toFixed(3))
+      hero.style.setProperty('--hy', ((e.clientY - r.top) / r.height - 0.5).toFixed(3))
+    }
     const tilt = target?.closest<HTMLElement>('[data-tilt]')
     if (tilt) {
       const r = tilt.getBoundingClientRect()

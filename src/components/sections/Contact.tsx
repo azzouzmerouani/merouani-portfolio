@@ -44,8 +44,8 @@ export default function Contact() {
                 }, prefersCalm() ? 0 : 520)
               }}
             >
-              <Mail aria-hidden="true" size={20} strokeWidth={2.4} />
-              <span className="max-w-[60vw] truncate">{contact.email}</span>
+              <Mail aria-hidden="true" size={20} strokeWidth={2.4} className="shrink-0" />
+              <span className="min-w-0 truncate">{contact.email}</span>
             </sakuga-button>
           </Reveal>
 
