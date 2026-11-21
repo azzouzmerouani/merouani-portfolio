@@ -15,11 +15,11 @@ export const brand = name.first
 export const year = '2026'
 
 export const contact = {
-  email: 'azzouzmerw@gmail.com',
+  email: 'marouaniazzouz@gmail.com',
   phone: '+213 562 41 39 35',
   phoneHref: 'tel:+213562413935',
-  github: 'github.com/azzouzin',
-  githubHref: 'https://github.com/azzouzin',
+  github: 'github.com/azzouzmerouani',
+  githubHref: 'https://github.com/azzouzmerouani',
   location: 'Setif, Algeria',
   timezone: 'GMT+1',
 }
@@ -132,13 +132,16 @@ export type Project = {
   href?: string
 }
 
+// Store links. Replace a store() search with the app's exact listing URL when you have it.
+const store = (app: string) => `https://play.google.com/store/search?q=${encodeURIComponent(app)}&c=apps`
+
 export const projects: Project[] = [
-  { name: 'Animo360', logo: '/images/logos/animo360.webp' },
-  { name: 'MizaniyaPay', logo: '/images/logos/mizaniyapay.webp' },
-  { name: 'Amwalflow', logo: '/images/logos/amwalflow.webp' },
-  { name: 'Dwaya', logo: '/images/logos/dwaya.webp' },
-  { name: 'Digihealth', logo: '/images/logos/digihealth.webp' },
-  { name: 'My TuniClaim', logo: '/images/logos/tuniclaim.webp' },
+  { name: 'Animo360', logo: '/images/logos/animo360.webp', href: store('Animo360') },
+  { name: 'MizaniyaPay', logo: '/images/logos/mizaniyapay.webp', href: 'https://apps.apple.com/app/id6758762310' },
+  { name: 'Amwalflow', logo: '/images/logos/amwalflow.webp', href: store('Amwalflow') },
+  { name: 'Dwaya', logo: '/images/logos/dwaya.webp', href: 'https://play.google.com/store/apps/developer?id=Dwaya' },
+  { name: 'Digihealth', logo: '/images/logos/digihealth.webp', href: store('Digihealth') },
+  { name: 'My TuniClaim', logo: '/images/logos/tuniclaim.webp', href: store('My TuniClaim') },
 ]
 
 export const expertise = {

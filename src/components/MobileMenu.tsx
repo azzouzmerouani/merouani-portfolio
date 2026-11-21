@@ -42,11 +42,11 @@ export default function MobileMenu({ open, onClose }: Props) {
   const shown = open ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
 
   return (
-    <div className="sm:hidden">
+    <div className="lg:hidden">
       <div
         aria-hidden="true"
         onClick={onClose}
-        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-500 motion-reduce:transition-none ${
+        className={`fixed inset-0 z-40 bg-navy-ink/40 backdrop-blur-sm transition-opacity duration-500 motion-reduce:transition-none ${
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
       />
@@ -57,7 +57,7 @@ export default function MobileMenu({ open, onClose }: Props) {
         aria-modal="true"
         aria-label="Menu"
         inert={!open}
-        className={`fixed inset-y-0 right-0 z-40 flex w-[80%] max-w-sm flex-col bg-[#141414] px-8 py-10 font-hn text-cream transition-transform duration-[600ms] motion-reduce:transition-none ${EASE_DRAWER} ${
+        className={`fixed inset-y-0 right-0 z-40 flex w-[84%] max-w-sm flex-col rounded-l-card bg-white px-7 py-9 text-navy shadow-lift transition-transform duration-[600ms] motion-reduce:transition-none ${EASE_DRAWER} ${
           open ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -67,17 +67,17 @@ export default function MobileMenu({ open, onClose }: Props) {
           aria-label="Close menu"
           onClick={onClose}
           style={reveal(300)}
-          className={`absolute right-6 top-6 transition-[transform,opacity] duration-500 motion-reduce:transition-none ${EASE_DRAWER} ${
+          className={`absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full bg-cloud transition-[transform,opacity] duration-500 motion-reduce:transition-none ${EASE_DRAWER} ${
             open ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'
           }`}
         >
-          <X size={26} strokeWidth={1.5} />
+          <X size={22} strokeWidth={2} />
         </button>
 
         <nav aria-label="Site index" className="mt-16">
           <p
             style={reveal(250)}
-            className={`text-xs uppercase tracking-[0.2em] text-cream/50 transition duration-700 motion-reduce:transition-none ${EASE_REVEAL} ${shown}`}
+            className={`text-xs font-bold uppercase tracking-[0.12em] text-slate/45 transition duration-700 motion-reduce:transition-none ${EASE_REVEAL} ${shown}`}
           >
             Site Index
           </p>
@@ -86,7 +86,7 @@ export default function MobileMenu({ open, onClose }: Props) {
               <li
                 key={link.label}
                 style={reveal(300 + i * 80)}
-                className={`text-4xl transition duration-700 motion-reduce:transition-none ${EASE_REVEAL} ${
+                className={`text-[2rem] font-bold leading-tight tracking-[-0.02em] transition duration-700 motion-reduce:transition-none ${EASE_REVEAL} ${
                   open ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
                 }`}
               >
@@ -101,11 +101,11 @@ export default function MobileMenu({ open, onClose }: Props) {
         <div className="mt-auto">
           <p
             style={reveal(500)}
-            className={`text-xs uppercase tracking-[0.2em] text-cream/50 transition duration-700 motion-reduce:transition-none ${EASE_REVEAL} ${shown}`}
+            className={`text-xs font-bold uppercase tracking-[0.12em] text-slate/45 transition duration-700 motion-reduce:transition-none ${EASE_REVEAL} ${shown}`}
           >
             Find Me
           </p>
-          <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          <ul className="mt-4 flex flex-wrap gap-2 text-sm font-bold">
             {social.map((link, i) => (
               <li
                 key={link.label}
@@ -114,6 +114,7 @@ export default function MobileMenu({ open, onClose }: Props) {
               >
                 <a
                   href={link.href}
+                  className="block rounded-full bg-cloud px-4 py-2"
                   {...(link.external && { target: '_blank', rel: 'noreferrer' })}
                 >
                   {link.label}

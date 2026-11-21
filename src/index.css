@@ -3,39 +3,86 @@
 @tailwind utilities;
 
 @layer base {
+  /* Section tones (volz.app palette). Values are space-separated RGB so Tailwind can add alpha. */
+  :root,
+  .tone-light {
+    --c-canvas: 255 255 255;
+    --c-heading: 7 65 131;
+    --c-body: 45 53 61;
+    --c-muted: 141 150 165;
+    --c-line: 229 237 244;
+    --c-surface: 255 255 255;
+    --c-chip: 238 242 247;
+  }
+
+  .tone-mist {
+    --c-canvas: 248 250 251;
+  }
+
+  .tone-navy {
+    --c-canvas: 7 65 131;
+    --c-heading: 255 255 255;
+    --c-body: 226 236 248;
+    --c-muted: 160 190 228;
+    --c-line: 40 96 160;
+    --c-surface: 16 76 146;
+    --c-chip: 26 88 158;
+  }
+
   html {
-    background-color: #000;
+    background-color: #fff;
     scroll-behavior: smooth;
   }
 
   body {
     min-height: 100%;
     margin: 0;
-    background-color: #000;
-    color: #efeee9;
-    font-family: 'Helvetica Neue ME', Helvetica, Arial, sans-serif;
+    background-color: #fff;
+    color: #2d353d;
+    font-family: Satoshi, -apple-system, system-ui, 'Segoe UI', sans-serif;
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background-color: #efeee9;
-    color: #0b0b0b;
+    background-color: rgb(0 178 255 / 0.25);
+    color: #074183;
   }
+}
+
+/* Hero sky: deep navy at the top fading to a bright horizon, with soft cloud banks. */
+.sky-backdrop {
+  background:
+    radial-gradient(60% 40% at 15% 100%, rgb(255 255 255 / 0.55), transparent 70%),
+    radial-gradient(55% 35% at 85% 105%, rgb(255 255 255 / 0.5), transparent 70%),
+    radial-gradient(40% 25% at 50% 110%, rgb(255 255 255 / 0.45), transparent 70%),
+    linear-gradient(180deg, #04203f 0%, #062a57 22%, #074183 48%, #2f7fd0 78%, #8ccaf2 100%);
+}
+
+/* Frosted pill used over the hero, like volz.app's header controls. */
+.glass {
+  background-color: rgb(255 255 255 / 0.18);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
 }
 
 /* Scroll reveals for the sections below the hero (toggled by useInView). */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(48px) scale(0.96);
+  filter: blur(10px);
   transition:
-    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .reveal.is-visible {
   opacity: 1;
   transform: none;
+  filter: none;
 }
 
 .reveal-line {
@@ -129,92 +176,202 @@
   }
 }
 
-/* Hanging characters: drop in, sway from the ledge, kick their legs. */
-.hang-drop {
+/* ---------- Motion layer ---------- */
+
+/* Top scroll-progress bar; --scroll is set by fx.ts. */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 60;
+  transform-origin: left;
+  transform: scaleX(var(--scroll, 0));
+  background: linear-gradient(90deg, #00b2ff, #4db8f5, #f5a623);
+  box-shadow: 0 0 12px rgb(0 178 255 / 0.6);
+}
+
+/* Section titles: each letter flips up out of a mask. */
+.split-word {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+  vertical-align: top;
+}
+.split-char {
+  display: inline-block;
+  transform: translateY(110%) rotate(12deg);
+  transform-origin: left bottom;
   opacity: 0;
-  transform: translateY(-60%);
   transition:
-    opacity 0.6s ease,
-    transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.6s ease;
+  transition-delay: calc(var(--i) * 28ms);
 }
-
-.hang-drop.is-visible {
-  opacity: 1;
+.is-visible .split-char {
   transform: none;
+  opacity: 1;
 }
 
-.hanger {
-  --s: 0.6;
-  width: calc(66px * var(--s));
+/* Cursor-following light on cards. */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(0 178 255 / 0.16), transparent 45%);
+  z-index: 1;
+}
+.spotlight:hover::after {
+  opacity: 1;
 }
 
-@media (min-width: 640px) {
-  .hanger {
-    --s: 1;
-  }
+/* 3D tilt; --rx/--ry are set by fx.ts on pointer move. */
+[data-tilt] {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+[data-tilt]:hover {
+  --lift: -6px;
+  transition: transform 0.12s linear, box-shadow 0.5s ease;
 }
 
-.hanger-svg {
-  width: calc(66px * var(--s));
-  height: calc(94px * var(--s));
-  margin-top: calc(-8px * var(--s));
+/* Sakuga VFX controls in the site palette (the effects canvas is recoloured in sakuga.ts). */
+:root {
+  --sk-ink: #074183;
+  --sk-dim: #8d96a5;
+  --sk-soft: #00b2ff;
+  --sk-pri: #4db8f5;
+  --sk-acc: #00b2ff;
+  --sk-r: 9999px;
+}
+sakuga-button.cta {
+  --sk-card: #ffffff;
+  --sk-btn-line: #04203f;
+  --sk-btn-sh: 6px 7px 0 #00b2ff;
+}
+sakuga-button.cta::part(button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 16px 30px;
+  font: 800 clamp(1rem, 2.4vw, 1.2rem) / 1.1 Satoshi, system-ui, sans-serif;
+  font-style: normal;
+  letter-spacing: -0.01em;
+}
+sakuga-button.quiet {
+  --sk-card: #eef2f7;
+  --sk-alt-line: #074183;
+  --sk-alt-sh: 3px 4px 0 #00b2ff;
+  --sk-bw: 2px;
+}
+sakuga-button.quiet::part(button) {
+  padding: 8px 18px;
+  font: 700 14px/1.2 Satoshi, system-ui, sans-serif;
 }
 
-.hang-rope {
-  width: 2px;
-  height: calc(var(--rope) * var(--s));
-  background: #9a7440;
-  box-shadow: 0 0 0 0.5px #1c1420;
+/* Light sweep across project tiles. */
+.shine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.35) 48%, transparent 62%);
+  transform: translateX(-120%);
+}
+.shine:hover::before {
+  transform: translateX(120%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.hang-sway {
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.55)) drop-shadow(0 8px 10px rgba(0, 0, 0, 0.35));
-  animation: hang-sway 4s ease-in-out infinite alternate;
+/* Magnetic buttons drift toward the cursor. */
+[data-magnetic] {
+  transform: translate(var(--tx, 0px), var(--ty, 0px));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.hang-leg-l,
-.hang-leg-r {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: hang-kick 2.4s ease-in-out infinite alternate;
+/* Parallax targets get --py from fx.ts. */
+[data-parallax] {
+  transform: translate3d(0, var(--py, 0px), 0);
+  will-change: transform;
 }
 
-.hang-leg-r {
-  animation-delay: -1.2s;
+/* Drifting colour blobs for navy panels. */
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  pointer-events: none;
+  animation: blob 18s ease-in-out infinite alternate;
+}
+@keyframes blob {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(18%, -12%) scale(1.15); }
+  66% { transform: translate(-14%, 10%) scale(0.9); }
+  100% { transform: translate(8%, 16%) scale(1.1); }
 }
 
-.hang-tail,
-.hang-scarf {
-  transform-box: fill-box;
-  transform-origin: 0% 0%;
-  animation: hang-flutter 2.2s ease-in-out infinite alternate;
+/* Twinkling sparkles over the hero sky. */
+.twinkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 0 10px 3px rgb(140 202 242 / 0.8);
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
 }
 
-@keyframes hang-sway {
-  from {
-    transform: rotateZ(-5deg) rotateY(-18deg);
-  }
-  to {
-    transform: rotateZ(5deg) rotateY(18deg);
-  }
+/* Gentle float for icons. */
+.float {
+  animation: float 5s ease-in-out infinite;
+}
+@keyframes float {
+  50% { transform: translateY(-8px) rotate(-3deg); }
 }
 
-@keyframes hang-kick {
-  from {
-    transform: rotate(-7deg);
-  }
-  to {
-    transform: rotate(7deg);
-  }
+/* Animated gradient text. */
+.text-shimmer {
+  background: linear-gradient(90deg, #ffffff, #8ccaf2, #00b2ff, #ffffff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 6s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: 300% 0; }
 }
 
-@keyframes hang-flutter {
-  from {
-    transform: rotate(-6deg);
-  }
-  to {
-    transform: rotate(8deg);
-  }
+/* Pulsing ring for the "current" chips. */
+.pulse-dot {
+  position: relative;
+}
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 2px solid currentColor;
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+@keyframes pulse-ring {
+  from { transform: scale(0.5); opacity: 1; }
+  to { transform: scale(1.6); opacity: 0; }
 }
 
 /* Delays are set inline, so !important is needed to override them. */
@@ -228,17 +385,20 @@
   }
 
   .marquee,
-  .hang-sway,
-  .hang-leg-l,
-  .hang-leg-r,
-  .hang-tail,
-  .hang-scarf {
+  .blob,
+  .twinkle,
+  .float,
+  .text-shimmer,
+  .pulse-dot::after {
     animation: none;
   }
 
-  .hang-drop {
+  .split-char,
+  [data-tilt],
+  [data-magnetic],
+  [data-parallax] {
     opacity: 1;
-    transform: none;
+    transform: none !important;
     transition: none;
   }
 
@@ -250,6 +410,7 @@
   .reveal-line,
   .reveal-mask {
     opacity: 1;
+    filter: none;
     transform: none;
     transition: none;
   }

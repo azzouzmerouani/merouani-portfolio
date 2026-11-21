@@ -1,13 +1,13 @@
-import { ArrowUp, ArrowUpRight } from 'lucide-react'
+import { Mail, MapPin, Phone } from 'lucide-react'
+import { prefersCalm } from '../../sakuga'
 import { contact, name, year } from '../../content'
-import { Reveal, RevealLine, RevealMask } from '../Reveal'
-import { Hangers } from '../Hangers'
+import { Reveal, RevealMask } from '../Reveal'
 import { SectionHeader } from '../Section'
 
 const details = [
-  { label: 'Phone', value: contact.phone, href: contact.phoneHref },
-  { label: 'GitHub', value: contact.github, href: contact.githubHref, external: true },
-  { label: 'Location', value: `${contact.location} — ${contact.timezone}` },
+  { label: 'Phone', value: contact.phone, href: contact.phoneHref, Icon: Phone },
+  { label: 'GitHub', value: contact.github, href: contact.githubHref, external: true, Icon: null },
+  { label: 'Location', value: `${contact.location} · ${contact.timezone}`, Icon: MapPin },
 ]
 
 export default function Contact() {
@@ -15,77 +15,91 @@ export default function Contact() {
     <section
       id="contact"
       aria-labelledby="contact-title"
-      className="relative overflow-hidden bg-black px-6 pt-28 text-cream sm:px-10 sm:pt-52"
+      className="tone-light relative overflow-x-clip bg-canvas px-5 pt-28 text-body sm:px-10 sm:pt-52"
     >
-      <Hangers id="contact" />
-      <SectionHeader id="contact-title" index="06" title="Contact" aside={contact.location} />
+      <div className="mx-auto max-w-6xl">
+        <SectionHeader id="contact-title" index="06" title="Contact" aside={contact.location} />
 
-      <p className="text-[clamp(4rem,15vw,15rem)] leading-[0.88] tracking-[-0.045em]">
-        <RevealMask>Let&rsquo;s talk.</RevealMask>
-      </p>
+        {/* Navy panel with the same sky gradient as the hero. */}
+        <div className="tone-navy relative rounded-[2rem] bg-[linear-gradient(160deg,#0d4f8f_0%,#074183_45%,#04203f_100%)] p-7 text-body shadow-lift sm:p-12 lg:p-16">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+            <div className="blob -right-24 -top-24 h-80 w-80 bg-sky/40" />
+            <div className="blob -bottom-24 -left-16 h-72 w-72 bg-[#5b6cff]/30 [animation-delay:-8s]" />
+          </div>
+          <p className="relative text-[clamp(3rem,10vw,8rem)] font-black leading-[0.95] tracking-[-0.045em] text-white">
+            <RevealMask>
+              <span className="text-shimmer">Let&rsquo;s talk.</span>
+            </RevealMask>
+          </p>
 
-      <Reveal delay={150} className="mt-10 sm:mt-14">
-        <a
-          href={`mailto:${contact.email}`}
-          className="group relative inline-flex items-center gap-3 pb-2 text-[clamp(1.4rem,4.6vw,4.25rem)] leading-tight tracking-[-0.02em] sm:gap-5"
-        >
-          {contact.email}
-          <ArrowUpRight
-            aria-hidden="true"
-            strokeWidth={1.25}
-            className="h-[0.8em] w-[0.8em] shrink-0 transition-transform duration-500 group-hover:rotate-45"
-          />
-          <span
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-cream transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:origin-right group-hover:scale-x-0"
-          />
-        </a>
-      </Reveal>
-
-      <dl className="mt-20 grid gap-x-6 gap-y-10 sm:mt-28 sm:grid-cols-3">
-        {details.map((item, i) => (
-          <Reveal key={item.label} delay={i * 90} className="border-t border-cream/20 pt-5">
-            <dt className="text-xs uppercase tracking-[0.2em] text-cream/50">{item.label}</dt>
-            <dd className="mt-4 text-lg sm:text-xl">
-              {item.href ? (
-                <a
-                  href={item.href}
-                  className="transition-opacity duration-300 hover:opacity-60"
-                  {...(item.external && { target: '_blank', rel: 'noreferrer' })}
-                >
-                  {item.value}
-                </a>
-              ) : (
-                item.value
-              )}
-            </dd>
+          <Reveal delay={150} className="relative mt-8 sm:mt-10">
+            <sakuga-button
+              class="cta"
+              aria-label={`Email ${contact.email}`}
+              onClick={(e) => {
+                const done = e.currentTarget as HTMLElement & { done?: () => void }
+                window.setTimeout(() => {
+                  done.done?.()
+                  window.location.href = `mailto:${contact.email}`
+                }, prefersCalm() ? 0 : 520)
+              }}
+            >
+              <Mail aria-hidden="true" size={20} strokeWidth={2.4} />
+              <span className="max-w-[60vw] truncate">{contact.email}</span>
+            </sakuga-button>
           </Reveal>
-        ))}
-      </dl>
 
-      <footer className="relative mt-28 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-6 text-xs sm:mt-40 sm:text-sm">
-        <div className="absolute inset-x-0 top-0 opacity-25">
-          <RevealLine className="h-px bg-current" />
+          <dl className="relative mt-10 grid gap-3 sm:mt-14 sm:grid-cols-3 sm:gap-4">
+            {details.map((item, i) => (
+              <Reveal key={item.label} delay={i * 90}>
+                <div data-tilt className="spotlight h-full rounded-2xl border border-white/15 bg-white/[0.07] p-5 backdrop-blur-sm">
+                  <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">
+                    {item.Icon && <item.Icon aria-hidden="true" size={14} strokeWidth={2.2} />}
+                    {item.label}
+                  </dt>
+                  <dd className="mt-2 text-lg font-bold text-white [overflow-wrap:anywhere]">
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="transition-colors duration-300 hover:text-sky"
+                        {...(item.external && { target: '_blank', rel: 'noreferrer' })}
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      item.value
+                    )}
+                  </dd>
+                </div>
+              </Reveal>
+            ))}
+          </dl>
         </div>
-        <p className="text-cream/60">
-          &copy; {year} {name.first} {name.last}
-        </p>
-        <a href="#top" className="group inline-flex items-center gap-2 transition-opacity duration-300 hover:opacity-60">
-          Back to top
-          <ArrowUp aria-hidden="true" size={16} strokeWidth={1.5} className="transition-transform duration-500 group-hover:-translate-y-1" />
-        </a>
-      </footer>
 
-      <div aria-hidden="true" className="-mx-6 overflow-hidden pb-6 sm:-mx-10 sm:pb-10">
+        <footer className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pb-6 pt-10 text-sm font-medium sm:pt-14">
+          <p className="text-muted">
+            &copy; {year} {name.first} {name.last} · Made in Algeria
+          </p>
+          <sakuga-button
+            variant="secondary"
+            class="quiet"
+            onClick={() => window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), prefersCalm() ? 0 : 260)}
+          >
+            Back to top ↑
+          </sakuga-button>
+        </footer>
+      </div>
+
+      <div aria-hidden="true" className="-mx-5 overflow-hidden pb-4 sm:-mx-10 sm:pb-6">
         <div
-          className="marquee flex w-max whitespace-nowrap text-[22vw] leading-[0.82] tracking-[-0.04em]"
+          className="marquee flex w-max whitespace-nowrap text-[20vw] font-black leading-[0.85] tracking-[-0.05em] text-cloud"
           style={{ animationDuration: '45s' }}
         >
           <span className="pr-[6vw]">
-            {name.first} &mdash; {name.last}&nbsp;
+            {name.first} {name.last}&nbsp;
           </span>
           <span className="pr-[6vw]">
-            {name.first} &mdash; {name.last}&nbsp;
+            {name.first} {name.last}&nbsp;
           </span>
         </div>
       </div>

@@ -8,39 +8,44 @@ type Props = {
   onToggleMenu: () => void
 }
 
-// Slides in once the hero is gone.
+// A floating frosted-white bar that slides in once the hero is gone.
 export default function StickyNav({ visible, active, menuOpen, onToggleMenu }: Props) {
   return (
-    <header
-      inert={!visible}
-      className={`fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-cream/10 bg-black/85 px-6 py-3 text-cream backdrop-blur-md transition-transform duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none sm:px-10 sm:py-5 ${
-        visible ? 'translate-y-0' : '-translate-y-full'
-      }`}
-    >
-      <a href="#top" className="text-lg tracking-wide">
-        {brand}
-      </a>
+    <div className="pointer-events-none fixed inset-x-3 top-3 z-30 flex justify-center sm:inset-x-6">
+      <header
+        inert={!visible}
+        className={`pointer-events-auto flex w-full max-w-5xl items-center justify-between rounded-full border border-white/60 bg-white/85 py-1.5 pl-5 pr-1.5 text-navy shadow-float backdrop-blur-xl transition-transform duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none sm:pl-6 sm:pr-2 ${
+          visible ? 'translate-y-0' : '-translate-y-[150%]'
+        }`}
+      >
+        <a href="#top" className="text-lg font-black uppercase tracking-[0.06em]">
+          {brand}
+          <span className="text-sky">.</span>
+        </a>
 
-      <nav aria-label="Sections" className="hidden sm:block">
-        <ul className="flex gap-6 text-sm lg:gap-9">
-          {siteIndex.map((link) => {
-            const isActive = active === link.href.slice(1)
-            return (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  aria-current={isActive ? 'true' : undefined}
-                  className={`transition-opacity duration-300 hover:opacity-100 ${isActive ? 'opacity-100' : 'opacity-50'}`}
-                >
-                  {link.label}
-                </a>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
+        <nav aria-label="Sections" className="hidden lg:block">
+          <ul className="flex text-sm font-bold">
+            {siteIndex.map((link) => {
+              const isActive = active === link.href.slice(1)
+              return (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    aria-current={isActive ? 'true' : undefined}
+                    className={`block rounded-full px-3 py-2 transition-colors duration-300 lg:px-4 ${
+                      isActive ? 'bg-navy text-white' : 'text-navy/60 hover:bg-cloud hover:text-navy'
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
 
-      <MenuButton open={menuOpen} onToggle={onToggleMenu} />
-    </header>
+        <MenuButton open={menuOpen} onToggle={onToggleMenu} tone="solid" className="lg:hidden" />
+      </header>
+    </div>
   )
 }

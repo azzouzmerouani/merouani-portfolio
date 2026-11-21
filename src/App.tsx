@@ -1,6 +1,8 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { initFx } from './fx'
 import { siteIndex } from './content'
 import { useScrollState } from './hooks/useScrollState'
+import FloatingCta from './components/FloatingCta'
 import Hero from './components/Hero'
 import MobileMenu from './components/MobileMenu'
 import StickyNav from './components/StickyNav'
@@ -18,9 +20,11 @@ export default function App() {
   const toggleMenu = useCallback(() => setMenuOpen((open) => !open), [])
   const closeMenu = useCallback(() => setMenuOpen(false), [])
   const { pastHero, active } = useScrollState('top', sectionIds)
+  useEffect(() => initFx(), [])
 
   return (
     <>
+      <div aria-hidden="true" className="scroll-progress" />
       <StickyNav visible={pastHero} active={active} menuOpen={menuOpen} onToggleMenu={toggleMenu} />
       <main>
         <Hero menuOpen={menuOpen} onToggleMenu={toggleMenu} />
@@ -31,6 +35,7 @@ export default function App() {
         <Education />
         <Contact />
       </main>
+      <FloatingCta visible={pastHero && active !== 'contact' && !menuOpen} />
       <MobileMenu open={menuOpen} onClose={closeMenu} />
     </>
   )

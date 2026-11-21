@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { useInView } from '../hooks/useInView'
 
 type Props = {
@@ -48,4 +48,49 @@ export function RevealMask({ children, className = '', delay = 0 }: Props) {
       </span>
     </span>
   )
+}
+
+// Splits text into letters that flip up one after another when scrolled into view.
+export function SplitText({ text, className = '' }: { text: string; className?: string }) {
+  const [ref, inView] = useInView<HTMLSpanElement>()
+  let i = 0
+  return (
+    <span ref={ref} aria-label={text} className={`${inView ? 'is-visible' : ''} ${className}`}>
+      {text.split(' ').map((word, w) => (
+        <span key={w} aria-hidden="true">
+          <span className="split-word">
+            {[...word].map((ch) => (
+              <span key={i} className="split-char" style={{ '--i': i++ } as CSSProperties}>
+                {ch}
+              </span>
+            ))}
+          </span>
+          {' '}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+// Counts up from zero once visible, keeping leading zeros ("06").
+export function CountUp({ value, duration = 1600 }: { value: string; duration?: number }) {
+  const [ref, inView] = useInView<HTMLSpanElement>()
+  const target = Number.parseInt(value, 10)
+  const [n, setN] = useState(0)
+  const calm = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  useEffect(() => {
+    if (!inView || Number.isNaN(target)) return
+    if (calm) return
+    let raf = 0
+    const start = performance.now()
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / duration)
+      setN(Math.round(target * (1 - Math.pow(1 - p, 4))))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [inView, target, duration, calm])
+  if (Number.isNaN(target)) return <span>{value}</span>
+  return <span ref={ref}>{String(calm ? target : n).padStart(value.length, '0')}</span>
 }
